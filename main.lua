@@ -23,12 +23,15 @@
 
 TICKBUFFER = 40
 DEBUGMODE = false
+LOGLATETICKS = true
+MSFORLATETICK = 500
 
 -- Globals
 
 PLUGIN = {}
 LOGPREFIX = ""
 TICKTIMES = {}
+LASTLATETICK = GetTime()
 
 -- Plugin Start
 
@@ -68,6 +71,10 @@ function OnTick(timeDelay)
 	end
 
 	table.insert(TICKTIMES, timeDelay)
+
+	if MSFORLATETICK < timeDelay and LOGLATETICK then
+		LOGWARN( LOGPREFIX .. " Tick took too long - took: " .. timeDelay .. " ms. Last late tick was: " .. GetTime() - LASTLATETICK .. " seconds ago!")
+	end
 
 	if DEBUGMODE then
 		LOG(timeDelay)
