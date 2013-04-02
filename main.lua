@@ -87,7 +87,7 @@ function HandleTPSCommand(Split, Player)
 
 	averageTPS = averageTPS / #TICKTIMES
 
-	Player:SendMessage("Average TPS over the last " .. #TICKTIMES .. " ticks is: " .. averageTPS / 2.5)
+	Player:SendMessage("Average TPS over the last " .. #TICKTIMES .. " ticks is: " .. (1000 / averageTPS))
 
 	return true
 
@@ -103,7 +103,7 @@ function HandleTPSCommandConsole(Split)
 
 	averageTPS = averageTPS / #TICKTIMES
 
-	LOG(LOGPREFIX .. "Average TPS over the last " .. #TICKTIMES .. " ticks is: " .. (averageTPS / 50) * 20)
+	LOG(LOGPREFIX .. "Average TPS over the last " .. #TICKTIMES .. " ticks is: " .. (1000 /averageTPS ))
 
 	return true
 
