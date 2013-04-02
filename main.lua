@@ -1,4 +1,4 @@
--- Copyright (c) 2012-2013 Alexander Harkness
+-- Copyright (c) 2013 Alexander Harkness
 
 -- Permission is hereby granted, free of charge, to any person obtaining a
 -- copy of this software and associated documentation files (the
