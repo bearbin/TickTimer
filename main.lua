@@ -21,10 +21,11 @@
 
 -- Configuration
 
-TICKBUFFER = 40
-DEBUGMODE = false
-LOGLATETICKS = true
-MSFORLATETICK = 500
+TICKBUFFER = 40 -- How many ticks the average is calculated over.
+DEBUGMODE = false -- Enable extra verbosity.
+LOGLATETICKS = true -- Log ticks that run late to the console.
+MSFORLATETICK = 500 -- Any tick that takes longer than this is classed "long".
+LATETICKDELAY = 10 -- The period where the server mutes more late tick logs to prevent console spam. Set to 0 to disable.
 
 -- Globals
 
@@ -32,6 +33,7 @@ PLUGIN = {}
 LOGPREFIX = ""
 TICKTIMES = {}
 LASTLATETICK = GetTime()
+LASTLATESECS = GetTime()
 
 -- Plugin Start
 
@@ -73,13 +75,13 @@ function OnTick(timeDelay)
 	table.insert(TICKTIMES, timeDelay)
 
 	if MSFORLATETICK < timeDelay and LOGLATETICK then
-		LOGWARN( LOGPREFIX .. " Tick took too long - took: " .. timeDelay .. " ms. Last late tick was: " .. GetTime() - LASTLATETICK .. " seconds ago!")
-	end
 
-	if DEBUGMODE then
-		LOG(timeDelay)
-		LOG(#TICKTIMES)
-		LOG(TICKTIMES[#TICKTIMES]) 
+		if GetTime() - LASTLATESECS > (LATETICKDELAY - 1) then
+			LOGWARN( LOGPREFIX .. " Tick took too long - took: " .. timeDelay .. " ms. Last late tick was: " .. GetTime() - LASTLATETICK .. " seconds ago!")
+		end
+
+		LASTLATESECS = GetTime()
+
 	end
 
 end
