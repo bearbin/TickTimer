@@ -39,18 +39,18 @@ LASTLATESECS = GetTime()
 
 function Initialize( Plugin )
 
-        PLUGIN = Plugin
-        PluginManager = cRoot:Get():GetPluginManager()
+    PLUGIN = Plugin
+    PluginManager = cRoot:Get():GetPluginManager()
 
-        Plugin:SetName( "TickTimer" )
-        Plugin:SetVersion( 1 )
+    Plugin:SetName( "TickTimer" )
+    Plugin:SetVersion( 2 )
 
 	LOGPREFIX = "["..Plugin:GetName().."] "
 
 	-- Hooks
 
-        PluginManager:AddHook(Plugin, cPluginManager.HOOK_TICK)
-        
+    cPluginManager.AddHook(cPluginManager.HOOK_WORLD_TICK, OnWorldTick)
+
 	-- Commands
 
 	PluginManager:BindCommand("/tps", "ticktimer.tps", HandleTPSCommand, "Find out the server's average tick rate.")
@@ -66,13 +66,17 @@ function OnDisable()
 	LOGINFO( LOGPREFIX .. "Plugin Disabled!" )
 end
 
-function OnTick(timeDelay)
+function OnWorldTick(world, timeDelay)
 
-	if #TICKTIMES == TICKBUFFER then
-		table.remove(TICKTIMES, 1)
+	if TICKTIMES[world:GetName()] == nil then
+		TICKTIMES[world:GetName()] = {}
 	end
 
-	table.insert(TICKTIMES, timeDelay)
+	if #TICKTIMES == TICKBUFFER then
+		table.remove(TICKTIMES[world:GetName()], 1)
+	end
+
+	table.insert(TICKTIMES[world:GetName()], timeDelay)
 
 	if MSFORLATETICK < timeDelay and LOGLATETICK then
 
@@ -88,15 +92,19 @@ end
 
 function HandleTPSCommand(Split, Player)
 
-	local averageTPS = 0
+	for world, ticks in pairs(TICKTIMES) do
 
-	for i = 1, #TICKTIMES do
-		averageTPS = averageTPS + TICKTIMES[i]
+		local averageTPS = 0
+
+		for i = 1, #ticks do
+			averageTPS = averageTPS + ticks[i]
+		end
+
+		averageTPS = averageTPS / #ticks
+
+		Player:SendMessage("[" .. world .. "] Average TPS over the last " .. #TICKTIMES .. " ticks is: " .. (1000 / averageTPS))
+
 	end
-
-	averageTPS = averageTPS / #TICKTIMES
-
-	Player:SendMessage("Average TPS over the last " .. #TICKTIMES .. " ticks is: " .. (1000 / averageTPS))
 
 	return true
 
@@ -104,15 +112,19 @@ end
 
 function HandleTPSCommandConsole(Split)
 
-	local averageTPS = 0
+	for world, ticks in pairs(TICKTIMES) do
 
-	for i = 1, #TICKTIMES do
-		averageTPS = averageTPS + TICKTIMES[i]
+		local averageTPS = 0
+
+		for i = 1, #ticks do
+			averageTPS = averageTPS + ticks[i]
+		end
+
+		averageTPS = averageTPS / #ticks
+
+		LOG("[" .. world .. "] Average TPS over the last " .. #TICKTIMES .. " ticks is: " .. (1000 / averageTPS))
+
 	end
-
-	averageTPS = averageTPS / #TICKTIMES
-
-	LOG(LOGPREFIX .. "Average TPS over the last " .. #TICKTIMES .. " ticks is: " .. (1000 /averageTPS ))
 
 	return true
 
