@@ -72,7 +72,7 @@ function OnWorldTick(world, timeDelay)
 		TICKTIMES[world:GetName()] = {}
 	end
 
-	if #TICKTIMES == TICKBUFFER then
+	if #TICKTIMES[world:GetName()] >= TICKBUFFER then
 		table.remove(TICKTIMES[world:GetName()], 1)
 	end
 
